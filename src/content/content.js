@@ -92,18 +92,24 @@ class ProductStatistics {
       
       // Method 2: Look for links with product URLs
       if (!productId) {
-        const link = tile.querySelector('a[href*="/product/"], a[href*="/p/"]');
+        const link = tile.querySelector('a');
         if (link) {
-          const match = link.href.match(/\/(product|p)\/([^/?]+)/);
-          if (match) {
-            productId = match[2];
+          try {
+            const url = new URL(link.href);
+            
+            // Fallback: try to extract themeId from URL parameters
+            const urlParams = new URLSearchParams(url.search);
+            productId = urlParams.get('themeId');
+
+          } catch (error) {
+            console.warn('Failed to parse URL:', link.href, error);
+            // Fallback to original regex method if URL parsing fails
+            const match = link.href.match(/\/(product|p)\/([^/?]+)/);
+            if (match) {
+              productId = match[2];
+            }
           }
         }
-      }
-      
-      // Method 3: Use index as fallback ID
-      if (!productId) {
-        productId = `product-${index + 1}`;
       }
       
       productIds.push(productId);
@@ -160,6 +166,8 @@ class ProductStatistics {
       const productId = tile.dataset.extractedProductId;
       const stats = this.findStatsForProduct(productId, statisticsData);
       
+      console.log(`Processing tile for product ID: ${productId}`, stats);
+
       if (stats) {
         this.createOverlay(tile, stats);
       } else {
@@ -174,20 +182,19 @@ class ProductStatistics {
   }
 
   findStatsForProduct(productId, statisticsData) {
-    // Try to match by exact ID first
-    let stats = statisticsData.find(item => item.id === productId);
+    console.log(`Finding stats for product ID: ${productId}`, statisticsData);
+    // Try to match by exact themeId first
+    let stats = statisticsData.find(item => item.themeId == productId);
+  
     
-    // If not found, try partial matching
-    if (!stats) {
-      stats = statisticsData.find(item => 
-        item.id && item.id.includes(productId.replace('product-', ''))
-      );
-    }
-    
-    // If still not found, use first available data as fallback
-    if (!stats && statisticsData.length > 0) {
-      const index = parseInt(productId.replace('product-', '')) - 1;
-      stats = statisticsData[index % statisticsData.length];
+    // Transform the API response structure to match expected format
+    if (stats && stats.orders) {
+      return {
+        id: stats.themeId,
+        orderCount: stats.orders.count || 0,
+        orderValue: stats.orders.value || 0,
+        productName: stats.productName || `Theme ${stats.themeId}`
+      };
     }
     
     return stats;

@@ -81,13 +81,16 @@ A Chrome extension that displays product statistics (order count and order value
 ```json
 [
   {
-    "id": "product-id",
-    "orderCount": 150,
-    "orderValue": 2500.00,
-    "productName": "Product Name"
+    "themeId": 1458,
+    "orders": {
+      "count": 1,
+      "value": 100
+    }
   }
 ]
 ```
+
+**Note**: The extension automatically transforms this API response format to match the internal data structure used for displaying statistics.
 
 ### File Structure
 
@@ -223,6 +226,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 📧 **Contact**: [Create an issue](https://github.com/Botz/product-statistics/issues/new)
 
 ## Changelog
+
+### v1.0.2 (2025-06-23)
+- **Bug Fix**: Fixed mapping between card-tiles and API data
+- **API Compatibility**: Updated code to handle correct API response structure (`themeId` and nested `orders` object)
+- **Improved Matching**: Enhanced product ID matching logic to work with actual API data format
+- **Documentation**: Updated README to reflect correct API response format
 
 ### v1.0.1 (2025-06-23)
 - **Performance Improvement**: Removed automatic API refetching on DOM changes

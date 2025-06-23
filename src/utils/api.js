@@ -15,7 +15,8 @@ export class ApiClient {
 
   /**
    * Fetch statistics data with caching
-   * @returns {Promise<Array>} Statistics data array
+   * @returns {Promise<Array>} Statistics data array with structure:
+   * [{ themeId: number, orders: { count: number, value: number } }]
    */
   async getStatistics() {
     const cacheKey = 'statistics';
