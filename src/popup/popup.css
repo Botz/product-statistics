@@ -164,6 +164,16 @@ body {
   transform: translateY(-1px);
 }
 
+.btn-warning {
+  background: #ffc107;
+  color: #212529;
+}
+
+.btn-warning:hover:not(:disabled) {
+  background: #e0a800;
+  transform: translateY(-1px);
+}
+
 .btn-icon {
   font-size: 16px;
 }

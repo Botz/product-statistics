@@ -9,6 +9,7 @@ class PopupController {
       toggleText: document.getElementById('toggleText'),
       refreshBtn: document.getElementById('refreshBtn'),
       resetOrderBtn: document.getElementById('resetOrderBtn'),
+      saveOrderBtn: document.getElementById('saveOrderBtn'),
       reportIssue: document.getElementById('reportIssue')
     };
     
@@ -20,6 +21,7 @@ class PopupController {
     this.elements.toggleBtn.addEventListener('click', () => this.handleToggle());
     this.elements.refreshBtn.addEventListener('click', () => this.handleRefresh());
     this.elements.resetOrderBtn.addEventListener('click', () => this.handleResetOrder());
+    this.elements.saveOrderBtn.addEventListener('click', () => this.handleSaveOrder());
     this.elements.reportIssue.addEventListener('click', () => this.handleReportIssue());
     
     // Initialize status
@@ -37,6 +39,7 @@ class PopupController {
         this.elements.toggleBtn.disabled = true;
         this.elements.refreshBtn.disabled = true;
         this.elements.resetOrderBtn.disabled = true;
+        this.elements.saveOrderBtn.disabled = true;
         return;
       }
       
@@ -142,6 +145,28 @@ class PopupController {
     } finally {
       this.elements.resetOrderBtn.disabled = false;
       this.elements.resetOrderBtn.querySelector('.btn-text').textContent = 'Reset Order';
+    }
+  }
+
+  async handleSaveOrder() {
+    try {
+      this.elements.saveOrderBtn.disabled = true;
+      this.elements.saveOrderBtn.querySelector('.btn-text').textContent = 'Saving...';
+      
+      const response = await this.sendMessageToContentScript({ action: 'saveOrder' });
+      
+      if (response && response.success) {
+        this.showFeedback('Order saved to server successfully');
+      } else {
+        this.showFeedback(response?.error || 'Failed to save order to server', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Failed to save order:', error);
+      this.showFeedback('Failed to save order to server', 'error');
+    } finally {
+      this.elements.saveOrderBtn.disabled = false;
+      this.elements.saveOrderBtn.querySelector('.btn-text').textContent = 'Save Order';
     }
   }
 

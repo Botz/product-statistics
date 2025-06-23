@@ -52,6 +52,7 @@ class ProductStatistics {
     const cardsGrid = document.querySelector('.cards-grid__container');
     if (cardsGrid && this.isEnabled) {
       console.log('Found cards-grid, processing product tiles...');
+      this.removeInfoTiles();
       this.processProductTiles(cardsGrid);
       this.initializeSortable(cardsGrid);
     }
@@ -360,11 +361,80 @@ class ProductStatistics {
     }
   }
 
+  /**
+   * Save current order to kartenliebe.de server
+   */
+  async saveOrderToServer() {
+    const cardsGrid = document.querySelector('.cards-grid');
+    if (!cardsGrid) {
+      throw new Error('Cards grid not found');
+    }
+
+    const cardsTiles = cardsGrid.querySelectorAll('.cards-tile');
+    if (cardsTiles.length === 0) {
+      throw new Error('No card tiles found');
+    }
+
+    // Build payload array with id and sort position
+    const payload = [];
+    cardsTiles.forEach((tile, index) => {
+      const productId = tile.dataset.extractedProductId;
+      if (productId) {
+        payload.push({
+          id: parseInt(productId),
+          sort: index + 1
+        });
+      }
+    });
+
+    if (payload.length === 0) {
+      throw new Error('No valid product IDs found');
+    }
+
+    console.log('Saving order to server:', payload);
+
+    try {
+      // Create FormData and add payload as 'sorted' field
+      const formData = new FormData();
+      formData.append('sorted', JSON.stringify(payload));
+
+      const response = await fetch('https://www.kartenliebe.de/designer-admin/themes-sorting/sort-themes', {
+        method: 'POST',
+        body: formData,
+        credentials: 'include' // Include cookies for authentication
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      const result = await response.json();
+      console.log('Order saved successfully:', result);
+      return result;
+
+    } catch (error) {
+      console.error('Failed to save order to server:', error);
+      throw error;
+    }
+  }
+
+  /**
+   * Remove all info-tile elements from the page
+   */
+  removeInfoTiles() {
+    const infoTiles = document.querySelectorAll('.info-tile');
+    if (infoTiles.length > 0) {
+      console.log(`Removing ${infoTiles.length} info-tile elements`);
+      infoTiles.forEach(tile => tile.remove());
+    }
+  }
+
   // Public methods for popup communication
   toggle() {
     this.isEnabled = !this.isEnabled;
     
     if (this.isEnabled) {
+      this.removeInfoTiles();
       this.checkForProductGrid();
     } else {
       this.removeAllOverlays();
@@ -374,7 +444,7 @@ class ProductStatistics {
         this.sortableInstance = null;
       }
       // Remove sortable class
-      const cardsGrid = document.querySelector('.cards-grid');
+      const cardsGrid = document.querySelector('.cards-grid__container');
       if (cardsGrid) {
         cardsGrid.classList.remove('sortable-enabled');
       }
@@ -462,6 +532,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       productStats.resetCustomOrder();
       sendResponse({ success: true });
       break;
+    case 'saveOrder':
+      productStats.saveOrderToServer()
+        .then(result => {
+          sendResponse({ success: true, result: result });
+        })
+        .catch(error => {
+          sendResponse({ success: false, error: error.message });
+        });
+      return true; // Keep message channel open for async response
   }
 });
 
