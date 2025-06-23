@@ -7,8 +7,8 @@ A Chrome extension that displays product statistics (order count and order value
 - 🎯 **Targeted Integration**: Works specifically on kartenliebe.de product grids
 - 📊 **Real-time Statistics**: Displays order count and total order value for each product
 - 🎨 **Non-intrusive Overlays**: Elegant overlays that don't interfere with the existing UI
-- ⚡ **Performance Optimized**: Lightweight with smart caching and debounced API calls
-- 🔄 **Auto-refresh**: Automatically updates when new products are loaded
+- ⚡ **Performance Optimized**: Lightweight with smart caching and minimal API calls
+- 🔄 **Smart Processing**: Automatically processes new product tiles with cached data
 - 🎛️ **Easy Control**: Simple popup interface to toggle and refresh data
 
 ## Installation
@@ -43,7 +43,8 @@ A Chrome extension that displays product statistics (order count and order value
    - Look for pages with `.cards-grid` containers
 
 2. **View Statistics**
-   - Product statistics will automatically appear as overlays on each product card
+   - Product statistics will automatically appear as overlays on each product card when the page loads
+   - New product tiles that appear dynamically will get overlays using cached data
    - Each overlay shows:
      - **Orders**: Total number of orders for the product
      - **Value**: Total monetary value of orders (in EUR)
@@ -52,8 +53,14 @@ A Chrome extension that displays product statistics (order count and order value
    - Click the extension icon in the Chrome toolbar
    - Use the popup to:
      - Toggle the extension on/off
-     - Refresh data manually
+     - Refresh data manually (fetches fresh data from API)
      - View extension status
+
+4. **Data Fetching Behavior**
+   - **Initial Load**: Data is fetched once when the page loads and product grids are detected
+   - **New Content**: Newly added product tiles automatically get overlays using existing cached data
+   - **Manual Refresh**: Use the "Refresh Data" button in the popup to fetch fresh data from the API
+   - **No Auto-Refresh**: The extension does not automatically refetch data when DOM changes occur
 
 ## Technical Details
 
@@ -63,7 +70,8 @@ A Chrome extension that displays product statistics (order count and order value
 - **Content Script Only**: Simplified architecture without background scripts
 - **Direct API Integration**: Content script communicates directly with the MockAPI endpoint
 - **Smart Caching**: 5-minute cache to reduce API calls
-- **DOM Monitoring**: Uses MutationObserver to detect dynamically loaded content
+- **Efficient DOM Monitoring**: Uses MutationObserver to process new product tiles with cached data
+- **Optimized API Usage**: Fetches data only on initial load and manual refresh
 
 ### API Integration
 
@@ -184,9 +192,10 @@ To use a different API endpoint:
 ## Performance
 
 - **Lightweight**: ~50KB total size
-- **Efficient**: Debounced DOM monitoring
+- **Efficient**: Optimized DOM monitoring with minimal API calls
 - **Cached**: 5-minute API response caching
 - **Non-blocking**: Asynchronous operations
+- **Reduced Network Traffic**: API calls only on page load and manual refresh
 
 ## Security
 
@@ -214,6 +223,12 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - 📧 **Contact**: [Create an issue](https://github.com/Botz/product-statistics/issues/new)
 
 ## Changelog
+
+### v1.0.1 (2025-06-23)
+- **Performance Improvement**: Removed automatic API refetching on DOM changes
+- **Optimized Behavior**: New product tiles now use cached data instead of triggering API calls
+- **Maintained Functionality**: Initial data fetch and manual refresh still work as expected
+- **Reduced Network Usage**: Significantly fewer API calls for better performance
 
 ### v1.0.0 (2025-06-23)
 - Initial release

@@ -22,7 +22,7 @@ class ProductStatistics {
   }
 
   startMonitoring() {
-    // Initial check
+    // Initial check - fetch data and inject overlays
     this.checkForProductGrid();
     
     // Monitor for dynamic content changes
@@ -32,8 +32,10 @@ class ProductStatistics {
           // Debounce to avoid excessive calls
           clearTimeout(this.debounceTimer);
           this.debounceTimer = setTimeout(() => {
-            this.checkForProductGrid();
-          }, 500);
+            // Only process new product tiles with existing cached data
+            // No refetching of API data
+            this.processNewProductTiles();
+          }, 1000); // Reduced debounce time since no API call
         }
       });
     });
@@ -232,6 +234,53 @@ class ProductStatistics {
   refresh() {
     this.cache.clear();
     this.checkForProductGrid();
+  }
+
+  /**
+   * Process new product tiles that appear in the DOM without refetching API data
+   * Uses existing cached data to inject overlays on newly added product tiles
+   */
+  processNewProductTiles() {
+    if (!this.isEnabled) {
+      return;
+    }
+
+    const cardsGrid = document.querySelector('.cards-grid');
+    if (!cardsGrid) {
+      return;
+    }
+
+    // Get cached statistics data
+    const cacheKey = 'statistics-data';
+    const cached = this.cache.get(cacheKey);
+    
+    if (!cached || Date.now() - cached.timestamp >= this.cacheExpiry) {
+      console.log('No valid cached data available for new product tiles');
+      return;
+    }
+
+    const statisticsData = cached.data;
+    console.log('Processing new product tiles with cached data');
+
+    // Find product tiles that don't have overlays yet
+    const cardsTiles = cardsGrid.querySelectorAll('.cards-tile');
+    const tilesWithoutOverlays = Array.from(cardsTiles).filter(tile =>
+      !tile.querySelector('.product-stats-overlay')
+    );
+
+    if (tilesWithoutOverlays.length === 0) {
+      return;
+    }
+
+    console.log(`Found ${tilesWithoutOverlays.length} new product tiles without overlays`);
+
+    // Extract product IDs for new tiles
+    const productIds = this.extractProductIds(tilesWithoutOverlays);
+    
+    if (productIds.length > 0) {
+      // Inject overlays using cached data
+      this.injectOverlays(tilesWithoutOverlays, statisticsData);
+    }
   }
 
   removeAllOverlays() {
