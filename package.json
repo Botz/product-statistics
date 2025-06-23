@@ -1,0 +1,40 @@
+{
+  "name": "product-statistics-chrome-extension",
+  "version": "1.0.0",
+  "description": "Chrome extension for displaying product statistics on Kartenliebe.de",
+  "main": "manifest.json",
+  "scripts": {
+    "dev": "echo 'Development mode - load unpacked extension in Chrome at chrome://extensions/'",
+    "build": "echo 'Build for production - extension is ready to package'",
+    "package": "zip -r product-statistics-v1.0.0.zip . -x node_modules/\\* .git/\\* *.md package*.json",
+    "lint": "eslint src/",
+    "test": "echo 'No tests specified yet'"
+  },
+  "keywords": [
+    "chrome-extension",
+    "product-statistics",
+    "kartenliebe",
+    "overlay",
+    "analytics"
+  ],
+  "author": "Kartenliebe Team",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Botz/product-statistics.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Botz/product-statistics/issues"
+  },
+  "homepage": "https://github.com/Botz/product-statistics#readme",
+  "devDependencies": {
+    "eslint": "^8.57.0",
+    "eslint-config-standard": "^17.1.0",
+    "eslint-plugin-import": "^2.29.1",
+    "eslint-plugin-n": "^16.6.2",
+    "eslint-plugin-promise": "^6.1.1"
+  },
+  "engines": {
+    "node": ">=16.0.0"
+  }
+}
