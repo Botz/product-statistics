@@ -117,3 +117,82 @@
   color: #FF9800;
   opacity: 0.8;
 }
+
+/* Sortable.js drag and drop styles */
+.cards-grid.sortable-enabled {
+  position: relative;
+}
+
+.cards-tile {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  cursor: grab;
+}
+
+.cards-tile:active {
+  cursor: grabbing;
+}
+
+.cards-tile.sortable-ghost {
+  opacity: 0.4;
+  background: rgba(0, 123, 255, 0.1);
+  border: 2px dashed #007bff;
+  transform: rotate(2deg);
+}
+
+.cards-tile.sortable-drag {
+  opacity: 0.8;
+  transform: scale(1.05);
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+  z-index: 1001;
+  cursor: grabbing;
+}
+
+.cards-tile.sortable-chosen {
+  transform: scale(1.02);
+  box-shadow: 0 4px 15px rgba(0, 123, 255, 0.3);
+}
+
+/* Drag handle indicator */
+.cards-tile::before {
+  content: '';
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  width: 20px;
+  height: 20px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 999;
+  background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16"><path fill="%23666" d="M3 6h2v2H3V6zm4 0h2v2H7V6zm4 0h2v2h-2V6zM3 10h2v2H3v-2zm4 0h2v2H7v-2zm4 0h2v2h-2v-2z"/></svg>');
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: 12px 12px;
+}
+
+.cards-tile:hover::before {
+  opacity: 0.6;
+}
+
+.cards-tile.sortable-chosen::before {
+  opacity: 1;
+  background: rgba(0, 123, 255, 0.2);
+}
+
+/* Disable drag handle on mobile to avoid conflicts */
+@media (max-width: 768px) {
+  .cards-tile::before {
+    display: none;
+  }
+}
+
+/* Smooth transitions for reordering */
+.cards-grid .cards-tile {
+  transition: transform 0.3s ease;
+}
+
+/* Visual feedback for drop zones */
+.sortable-fallback {
+  display: none !important;
+}

@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Product Statistics",
-  "version": "1.0.2",
+  "version": "1.1.0",
   "description": "Display product statistics on Kartenliebe.de",
   "permissions": ["activeTab"],
   "host_permissions": [
@@ -10,7 +10,7 @@
   ],
   "content_scripts": [{
     "matches": ["https://www.kartenliebe.de/*"],
-    "js": ["src/content/content.js"],
+    "js": ["src/lib/sortable.min.js", "src/content/content.js"],
     "css": ["src/content/overlay.css"]
   }],
   "action": {

@@ -6,7 +6,9 @@ class ProductStatistics {
     this.apiEndpoint = 'https://6858ebf3138a18086dfc43e0.mockapi.io/web-api/theme-statistics';
     this.cache = new Map();
     this.cacheExpiry = 5 * 60 * 1000; // 5 minutes
-    this.isEnabled = true;
+    this.isEnabled = false;
+    this.sortableInstance = null;
+    this.customOrder = this.loadCustomOrder();
     this.init();
   }
 
@@ -47,10 +49,11 @@ class ProductStatistics {
   }
 
   checkForProductGrid() {
-    const cardsGrid = document.querySelector('.cards-grid');
+    const cardsGrid = document.querySelector('.cards-grid__container');
     if (cardsGrid && this.isEnabled) {
       console.log('Found cards-grid, processing product tiles...');
       this.processProductTiles(cardsGrid);
+      this.initializeSortable(cardsGrid);
     }
   }
 
@@ -225,6 +228,138 @@ class ProductStatistics {
     console.log(`Overlay created for product ${tile.dataset.extractedProductId}:`, stats);
   }
 
+  /**
+   * Initialize sortable functionality for the cards grid
+   */
+  initializeSortable(cardsGrid) {
+    // Destroy existing sortable instance if it exists
+    if (this.sortableInstance) {
+      this.sortableInstance.destroy();
+    }
+
+    // Check if Sortable is available
+    if (typeof Sortable === 'undefined') {
+      console.warn('Sortable.js not loaded, drag and drop functionality disabled');
+      return;
+    }
+
+    // Add sortable class to grid
+    cardsGrid.classList.add('sortable-enabled');
+
+    // Apply custom order if it exists
+    this.applyCustomOrder(cardsGrid);
+
+    // Initialize sortable
+    this.sortableInstance = Sortable.create(cardsGrid, {
+
+
+      
+      onEnd: (evt) => {
+        console.log('Drag ended:', evt.item, 'from', evt.oldIndex, 'to', evt.newIndex);
+        document.body.style.userSelect = '';
+        
+        // Save new order if position changed
+        if (evt.oldIndex !== evt.newIndex) {
+          this.saveCustomOrder(cardsGrid);
+        }
+      },
+
+    });
+
+    console.log('Sortable initialized for cards grid');
+  }
+
+  /**
+   * Apply custom order to cards grid
+   */
+  applyCustomOrder(cardsGrid) {
+    if (!this.customOrder || this.customOrder.length === 0) {
+      return;
+    }
+
+    const cardsTiles = Array.from(cardsGrid.querySelectorAll('.cards-tile'));
+    const orderedTiles = [];
+
+    // First, add tiles in the saved order
+    this.customOrder.forEach(productId => {
+      const tile = cardsTiles.find(tile =>
+        tile.dataset.extractedProductId === productId
+      );
+      if (tile) {
+        orderedTiles.push(tile);
+      }
+    });
+
+    // Then add any new tiles that weren't in the saved order
+    cardsTiles.forEach(tile => {
+      if (!orderedTiles.includes(tile)) {
+        orderedTiles.push(tile);
+      }
+    });
+
+    // Reorder the DOM elements
+    orderedTiles.forEach(tile => {
+      cardsGrid.appendChild(tile);
+    });
+
+    console.log('Applied custom order to', orderedTiles.length, 'tiles');
+  }
+
+  /**
+   * Save current order to localStorage
+   */
+  saveCustomOrder(cardsGrid) {
+    const cardsTiles = cardsGrid.querySelectorAll('.cards-tile');
+    const order = Array.from(cardsTiles).map(tile =>
+      tile.dataset.extractedProductId
+    ).filter(id => id); // Filter out null/undefined IDs
+
+    this.customOrder = order;
+    
+    try {
+      localStorage.setItem('productStats_cardOrder', JSON.stringify(order));
+      console.log('Saved custom order:', order);
+    } catch (error) {
+      console.error('Failed to save custom order:', error);
+    }
+  }
+
+  /**
+   * Load custom order from localStorage
+   */
+  loadCustomOrder() {
+    try {
+      const saved = localStorage.getItem('productStats_cardOrder');
+      if (saved) {
+        const order = JSON.parse(saved);
+        console.log('Loaded custom order:', order);
+        return order;
+      }
+    } catch (error) {
+      console.error('Failed to load custom order:', error);
+    }
+    return [];
+  }
+
+  /**
+   * Reset custom order
+   */
+  resetCustomOrder() {
+    this.customOrder = [];
+    try {
+      localStorage.removeItem('productStats_cardOrder');
+      console.log('Reset custom order');
+      
+      // Reinitialize sortable to apply default order
+      const cardsGrid = document.querySelector('.cards-grid__container');
+      if (cardsGrid) {
+        this.initializeSortable(cardsGrid);
+      }
+    } catch (error) {
+      console.error('Failed to reset custom order:', error);
+    }
+  }
+
   // Public methods for popup communication
   toggle() {
     this.isEnabled = !this.isEnabled;
@@ -233,6 +368,16 @@ class ProductStatistics {
       this.checkForProductGrid();
     } else {
       this.removeAllOverlays();
+      // Destroy sortable instance when disabled
+      if (this.sortableInstance) {
+        this.sortableInstance.destroy();
+        this.sortableInstance = null;
+      }
+      // Remove sortable class
+      const cardsGrid = document.querySelector('.cards-grid');
+      if (cardsGrid) {
+        cardsGrid.classList.remove('sortable-enabled');
+      }
     }
     
     return this.isEnabled;
@@ -312,6 +457,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       break;
     case 'getStatus':
       sendResponse({ enabled: productStats.isEnabled });
+      break;
+    case 'resetOrder':
+      productStats.resetCustomOrder();
+      sendResponse({ success: true });
       break;
   }
 });

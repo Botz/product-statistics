@@ -8,6 +8,7 @@ class PopupController {
       toggleBtn: document.getElementById('toggleBtn'),
       toggleText: document.getElementById('toggleText'),
       refreshBtn: document.getElementById('refreshBtn'),
+      resetOrderBtn: document.getElementById('resetOrderBtn'),
       reportIssue: document.getElementById('reportIssue')
     };
     
@@ -18,6 +19,7 @@ class PopupController {
     // Set up event listeners
     this.elements.toggleBtn.addEventListener('click', () => this.handleToggle());
     this.elements.refreshBtn.addEventListener('click', () => this.handleRefresh());
+    this.elements.resetOrderBtn.addEventListener('click', () => this.handleResetOrder());
     this.elements.reportIssue.addEventListener('click', () => this.handleReportIssue());
     
     // Initialize status
@@ -34,6 +36,7 @@ class PopupController {
         this.setStatus('inactive', 'Not on kartenliebe.de');
         this.elements.toggleBtn.disabled = true;
         this.elements.refreshBtn.disabled = true;
+        this.elements.resetOrderBtn.disabled = true;
         return;
       }
       
@@ -65,9 +68,11 @@ class PopupController {
     if (isEnabled) {
       this.elements.toggleText.textContent = 'Disable';
       this.elements.toggleBtn.querySelector('.btn-icon').textContent = '⏸️';
+      this.elements.toggleBtn.className = 'btn btn-primary';
     } else {
       this.elements.toggleText.textContent = 'Enable';
       this.elements.toggleBtn.querySelector('.btn-icon').textContent = '▶️';
+      this.elements.toggleBtn.className = 'btn btn-success';
     }
   }
 
@@ -115,6 +120,28 @@ class PopupController {
     } finally {
       this.elements.refreshBtn.disabled = false;
       this.elements.refreshBtn.querySelector('.btn-text').textContent = 'Refresh Data';
+    }
+  }
+
+  async handleResetOrder() {
+    try {
+      this.elements.resetOrderBtn.disabled = true;
+      this.elements.resetOrderBtn.querySelector('.btn-text').textContent = 'Resetting...';
+      
+      const response = await this.sendMessageToContentScript({ action: 'resetOrder' });
+      
+      if (response && response.success) {
+        this.showFeedback('Card order reset successfully');
+      } else {
+        this.showFeedback('Failed to reset card order', 'error');
+      }
+      
+    } catch (error) {
+      console.error('Failed to reset order:', error);
+      this.showFeedback('Failed to reset card order', 'error');
+    } finally {
+      this.elements.resetOrderBtn.disabled = false;
+      this.elements.resetOrderBtn.querySelector('.btn-text').textContent = 'Reset Order';
     }
   }
 

@@ -10,7 +10,7 @@
   <div class="popup-container">
     <header class="popup-header">
       <h1>Product Statistics</h1>
-      <div class="version">v1.0.1</div>
+      <div class="version">v1.1.0</div>
     </header>
     
     <main class="popup-content">
@@ -22,14 +22,19 @@
       </div>
       
       <div class="controls-section">
-        <button class="btn btn-primary" id="toggleBtn">
-          <span class="btn-icon">⏸️</span>
-          <span class="btn-text" id="toggleText">Disable</span>
+        <button class="btn btn-success" id="toggleBtn">
+          <span class="btn-icon">▶️</span>
+          <span class="btn-text" id="toggleText">Enable</span>
         </button>
         
         <button class="btn btn-secondary" id="refreshBtn">
           <span class="btn-icon">🔄</span>
           <span class="btn-text">Refresh Data</span>
+        </button>
+        
+        <button class="btn btn-tertiary" id="resetOrderBtn">
+          <span class="btn-icon">🔀</span>
+          <span class="btn-text">Reset Order</span>
         </button>
       </div>
       
@@ -47,7 +52,7 @@
       <div class="help-section">
         <details>
           <summary>How it works</summary>
-          <p>This extension displays order statistics on product cards when you visit kartenliebe.de. The overlays show order count and total value for each product.</p>
+          <p>This extension displays order statistics on product cards when you visit kartenliebe.de. The overlays show order count and total value for each product. You can drag and drop cards to rearrange them - your custom order will be saved automatically.</p>
         </details>
       </div>
     </main>

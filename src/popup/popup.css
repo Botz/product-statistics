@@ -144,6 +144,26 @@ body {
   transform: translateY(-1px);
 }
 
+.btn-tertiary {
+  background: #17a2b8;
+  color: white;
+}
+
+.btn-tertiary:hover:not(:disabled) {
+  background: #138496;
+  transform: translateY(-1px);
+}
+
+.btn-success {
+  background: #28a745;
+  color: white;
+}
+
+.btn-success:hover:not(:disabled) {
+  background: #218838;
+  transform: translateY(-1px);
+}
+
 .btn-icon {
   font-size: 16px;
 }
