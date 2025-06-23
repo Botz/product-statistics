@@ -349,6 +349,8 @@ class ProductStatistics {
     this.customOrder = [];
     try {
       localStorage.removeItem('productStats_cardOrder');
+      window.location.reload();
+      this.isEnabled = false
       console.log('Reset custom order');
       
       // Reinitialize sortable to apply default order
@@ -530,7 +532,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       break;
     case 'resetOrder':
       productStats.resetCustomOrder();
-      sendResponse({ success: true });
+      sendResponse({ success: true, enabled: productStats.isEnabled });
       break;
     case 'saveOrder':
       productStats.saveOrderToServer()

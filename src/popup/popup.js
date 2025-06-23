@@ -135,6 +135,15 @@ class PopupController {
       
       if (response && response.success) {
         this.showFeedback('Card order reset successfully');
+        
+        // Update UI to reflect the new enabled state
+        if (response.enabled !== undefined) {
+          this.setStatus(
+            response.enabled ? 'active' : 'disabled',
+            response.enabled ? 'Active' : 'Disabled'
+          );
+          this.updateToggleButton(response.enabled);
+        }
       } else {
         this.showFeedback('Failed to reset card order', 'error');
       }
