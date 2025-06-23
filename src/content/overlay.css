@@ -1,0 +1,119 @@
+/* Product Statistics Overlay Styles */
+
+.product-stats-overlay {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0, 0, 0, 0.85);
+  color: white;
+  padding: 8px 12px;
+  border-radius: 6px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-size: 12px;
+  line-height: 1.4;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+  backdrop-filter: blur(4px);
+  z-index: 1000;
+  min-width: 80px;
+  transition: all 0.2s ease;
+}
+
+.product-stats-overlay:hover {
+  background: rgba(0, 0, 0, 0.95);
+  transform: scale(1.05);
+}
+
+.stats-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.stats-item:last-child {
+  margin-bottom: 0;
+}
+
+.stats-label {
+  font-weight: 500;
+  opacity: 0.9;
+  margin-right: 8px;
+}
+
+.stats-value {
+  font-weight: 600;
+  color: #4CAF50;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .product-stats-overlay {
+    font-size: 11px;
+    padding: 6px 10px;
+    top: 4px;
+    right: 4px;
+  }
+}
+
+/* Animation for when overlay appears */
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.product-stats-overlay {
+  animation: fadeInScale 0.3s ease-out;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .product-stats-overlay {
+    background: black;
+    border: 1px solid white;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .product-stats-overlay {
+    animation: none;
+    transition: none;
+  }
+  
+  .product-stats-overlay:hover {
+    transform: none;
+  }
+}
+
+/* Dark theme compatibility */
+@media (prefers-color-scheme: dark) {
+  .product-stats-overlay {
+    background: rgba(255, 255, 255, 0.9);
+    color: #333;
+  }
+  
+  .product-stats-overlay:hover {
+    background: rgba(255, 255, 255, 0.95);
+  }
+  
+  .stats-value {
+    color: #2E7D32;
+  }
+}
+
+/* Ensure overlay doesn't interfere with product interactions */
+.product-stats-overlay {
+  pointer-events: none;
+}
+
+/* Special styling for zero values */
+.stats-value[data-zero="true"] {
+  color: #FF9800;
+  opacity: 0.8;
+}
