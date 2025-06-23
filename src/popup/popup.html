@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product Statistics</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="popup-container">
+    <header class="popup-header">
+      <h1>Product Statistics</h1>
+      <div class="version">v1.0.0</div>
+    </header>
+    
+    <main class="popup-content">
+      <div class="status-section">
+        <div class="status-indicator">
+          <div class="status-dot" id="statusDot"></div>
+          <span class="status-text" id="statusText">Loading...</span>
+        </div>
+      </div>
+      
+      <div class="controls-section">
+        <button class="btn btn-primary" id="toggleBtn">
+          <span class="btn-icon">⏸️</span>
+          <span class="btn-text" id="toggleText">Disable</span>
+        </button>
+        
+        <button class="btn btn-secondary" id="refreshBtn">
+          <span class="btn-icon">🔄</span>
+          <span class="btn-text">Refresh Data</span>
+        </button>
+      </div>
+      
+      <div class="info-section">
+        <div class="info-item">
+          <span class="info-label">Target Site:</span>
+          <span class="info-value">kartenliebe.de</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">Data Source:</span>
+          <span class="info-value">MockAPI</span>
+        </div>
+      </div>
+      
+      <div class="help-section">
+        <details>
+          <summary>How it works</summary>
+          <p>This extension displays order statistics on product cards when you visit kartenliebe.de. The overlays show order count and total value for each product.</p>
+        </details>
+      </div>
+    </main>
+    
+    <footer class="popup-footer">
+      <div class="footer-links">
+        <a href="https://github.com/Botz/product-statistics" target="_blank">GitHub</a>
+        <span class="separator">•</span>
+        <a href="#" id="reportIssue">Report Issue</a>
+      </div>
+    </footer>
+  </div>
+  
+  <script src="popup.js"></script>
+</body>
+</html>
