@@ -5,9 +5,9 @@
  */
 export class ApiClient {
   constructor() {
-    this.baseUrl = 'https://6858ebf3138a18086dfc43e0.mockapi.io/web-api';
+    this.baseUrl = 'https://www-botz-dev.staging.kartenliebe.de/web-api/';
     this.endpoints = {
-      statistics: '/theme-statistics'
+      statistics: '/themes-order-statistics?occasion=hochzeit&category=einladungskarte'
     };
     this.cache = new Map();
     this.cacheExpiry = 5 * 60 * 1000; // 5 minutes

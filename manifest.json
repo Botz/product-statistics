@@ -5,11 +5,10 @@
   "description": "Display product statistics on Kartenliebe.de",
   "permissions": ["activeTab"],
   "host_permissions": [
-    "https://www.kartenliebe.de/*",
-    "https://6858ebf3138a18086dfc43e0.mockapi.io/*"
+    "https://www.kartenliebe.de/*"
   ],
   "content_scripts": [{
-    "matches": ["https://www.kartenliebe.de/*"],
+    "matches": ["https://www.kartenliebe.de/*", "http://shop.kartenliebe.de/*"],
     "js": ["src/lib/sortable.min.js", "src/content/content.js"],
     "css": ["src/content/overlay.css"]
   }],

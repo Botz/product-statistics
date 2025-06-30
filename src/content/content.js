@@ -3,7 +3,7 @@
 
 class ProductStatistics {
   constructor() {
-    this.apiEndpoint = 'https://6858ebf3138a18086dfc43e0.mockapi.io/web-api/theme-statistics';
+    this.apiEndpoint = 'https://www.kartenliebe.de/web-api/themes-order-statistics';
     this.cache = new Map();
     this.cacheExpiry = 5 * 60 * 1000; // 5 minutes
     this.isEnabled = false;
@@ -134,9 +134,13 @@ class ProductStatistics {
       return cached.data;
     }
 
+    const cardsGrid = document.querySelector('.cards-grid');
+
+    const { category, occasion } = cardsGrid.dataset;
+
     try {
       console.log('Fetching statistics from API...');
-      const response = await fetch(this.apiEndpoint);
+      const response = await fetch(this.apiEndpoint + `?occasion=${occasion}&category=${category}`);
       
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`);
@@ -188,18 +192,7 @@ class ProductStatistics {
   findStatsForProduct(productId, statisticsData) {
     console.log(`Finding stats for product ID: ${productId}`, statisticsData);
     // Try to match by exact themeId first
-    let stats = statisticsData.find(item => item.themeId == productId);
-  
-    
-    // Transform the API response structure to match expected format
-    if (stats && stats.orders) {
-      return {
-        id: stats.themeId,
-        orderCount: stats.orders.count || 0,
-        orderValue: stats.orders.value || 0,
-        productName: stats.productName || `Theme ${stats.themeId}`
-      };
-    }
+    let stats = statisticsData.payload.find(item => item.themeId == productId);
     
     return stats;
   }
@@ -208,17 +201,27 @@ class ProductStatistics {
     const overlay = document.createElement('div');
     overlay.className = 'product-stats-overlay';
     
-    const orderCount = stats.orderCount || 0;
-    const orderValue = stats.orderValue || 0;
+    const orderCount12m = stats.salesCount_last_12_months || 0;
+    const orderCount3m = stats.salesCount_last_3_months || 0;
+    const orderCount1m = stats.salesCount_last_month || 0;
+    const orderCount1w = stats.salesCount_last_week || 0;
     
     overlay.innerHTML = `
       <div class="stats-item">
-        <span class="stats-label">Orders:</span>
-        <span class="stats-value">${orderCount}</span>
+        <span class="stats-label">Orders 12m:</span>
+        <span class="stats-value">${orderCount12m}</span>
       </div>
       <div class="stats-item">
-        <span class="stats-label">Value:</span>
-        <span class="stats-value">€${orderValue.toFixed(2)}</span>
+        <span class="stats-label">Orders 3m:</span>
+        <span class="stats-value">${orderCount3m}</span>
+      </div>
+      <div class="stats-item">
+        <span class="stats-label">Orders 1m:</span>
+        <span class="stats-value">${orderCount1m}</span>
+      </div>
+      <div class="stats-item">
+        <span class="stats-label">Orders 1week:</span>
+        <span class="stats-value">${orderCount1w}</span>
       </div>
     `;
     
