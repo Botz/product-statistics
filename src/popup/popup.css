@@ -293,6 +293,116 @@ body {
   }
 }
 
+/* TileCount Error Styles */
+.tilecount-error {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #fff3cd;
+  border: 1px solid #ffeaa7;
+  border-left: 4px solid #f39c12;
+  border-radius: 6px;
+  animation: slideDown 0.3s ease;
+}
+
+.error-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.error-icon {
+  font-size: 18px;
+}
+
+.error-title {
+  font-weight: 600;
+  color: #856404;
+  font-size: 15px;
+}
+
+.error-message {
+  color: #856404;
+  font-size: 14px;
+  line-height: 1.4;
+  margin-bottom: 12px;
+}
+
+.error-help {
+  color: #6c5700;
+  font-size: 13px;
+  line-height: 1.4;
+  padding: 8px 12px;
+  background: rgba(255, 193, 7, 0.1);
+  border-radius: 4px;
+}
+
+.error-help strong {
+  font-weight: 600;
+}
+
+.error-help code {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 2px 4px;
+  border-radius: 3px;
+  font-family: 'SF Mono', Monaco, 'Cascadia Code', monospace;
+  font-size: 12px;
+}
+
+.fix-tilecount-link {
+  color: #007bff;
+  text-decoration: none;
+  font-weight: 600;
+  border-bottom: 1px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.fix-tilecount-link:hover {
+  color: #0056b3;
+  border-bottom-color: #0056b3;
+  text-decoration: none;
+}
+
+.fix-tilecount-link:active {
+  color: #004085;
+}
+
+/* Dark mode support for error */
+@media (prefers-color-scheme: dark) {
+  .tilecount-error {
+    background: #3d2914;
+    border-color: #8b6914;
+    border-left-color: #f39c12;
+  }
+  
+  .error-title,
+  .error-message {
+    color: #ffd93d;
+  }
+  
+  .error-help {
+    color: #e6cc00;
+    background: rgba(255, 193, 7, 0.05);
+  }
+  
+  .error-help code {
+    background: rgba(255, 255, 255, 0.1);
+  }
+  
+  .fix-tilecount-link {
+    color: #4dabf7;
+  }
+  
+  .fix-tilecount-link:hover {
+    color: #339af0;
+    border-bottom-color: #339af0;
+  }
+  
+  .fix-tilecount-link:active {
+    color: #228be6;
+  }
+}
+
 /* Responsive adjustments */
 @media (max-width: 350px) {
   .popup-container {

@@ -47,11 +47,25 @@ class PopupController {
       const response = await this.sendMessageToContentScript({ action: 'getStatus' });
       
       if (response && response.enabled !== undefined) {
-        this.setStatus(
-          response.enabled ? 'active' : 'disabled',
-          response.enabled ? 'Active' : 'Disabled'
-        );
-        this.updateToggleButton(response.enabled);
+        // Check for tileCount error
+        if (response.tileCountError) {
+          this.setStatus('error', 'TileCount Error');
+          this.showTileCountError(response.tileCountError);
+          this.elements.toggleBtn.disabled = true;
+          this.elements.refreshBtn.disabled = true;
+          this.elements.resetOrderBtn.disabled = true;
+          this.elements.saveOrderBtn.disabled = true;
+        } else {
+          this.setStatus(
+            response.enabled ? 'active' : 'disabled',
+            response.enabled ? 'Active' : 'Disabled'
+          );
+          this.updateToggleButton(response.enabled);
+          this.elements.toggleBtn.disabled = false;
+          this.elements.refreshBtn.disabled = false;
+          this.elements.resetOrderBtn.disabled = false;
+          this.elements.saveOrderBtn.disabled = false;
+        }
       } else {
         this.setStatus('error', 'Extension not loaded');
       }
@@ -94,6 +108,14 @@ class PopupController {
         
         // Show feedback
         this.showFeedback(response.enabled ? 'Extension enabled' : 'Extension disabled');
+      } else {
+        // Check if toggle failed due to tileCount error
+        const statusResponse = await this.sendMessageToContentScript({ action: 'getStatus' });
+        if (statusResponse && statusResponse.tileCountError) {
+          this.showFeedback('Cannot enable: TileCount must be 999 or higher', 'error');
+        } else {
+          this.showFeedback('Failed to toggle extension', 'error');
+        }
       }
       
     } catch (error) {
@@ -218,6 +240,74 @@ class PopupController {
         feedback.parentNode.removeChild(feedback);
       }
     }, 3000);
+  }
+
+  showTileCountError(errorMessage) {
+    // Remove any existing error message
+    const existingError = document.querySelector('.tilecount-error');
+    if (existingError) {
+      existingError.remove();
+    }
+
+    // Create error message element
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'tilecount-error';
+    errorDiv.innerHTML = `
+      <div class="error-header">
+        <span class="error-icon">⚠️</span>
+        <span class="error-title">TileCount Requirement Not Met</span>
+      </div>
+      <div class="error-message">${errorMessage}</div>
+      <div class="error-help">
+        <strong>How to fix:</strong> <a href="#" class="fix-tilecount-link">Click here to add tileCount=999</a> to the current page, or manually add <code>?tileCount=999</code> to the URL.
+      </div>
+    `;
+    
+    // Add click handler for the fix link
+    const fixLink = errorDiv.querySelector('.fix-tilecount-link');
+    fixLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      this.handleFixTileCount();
+    });
+    
+    // Insert after status section
+    const statusSection = document.querySelector('.status-section');
+    statusSection.insertAdjacentElement('afterend', errorDiv);
+  }
+
+  async handleFixTileCount() {
+    try {
+      const tabs = await chrome.tabs.query({ active: true, currentWindow: true });
+      const currentTab = tabs[0];
+      
+      if (!currentTab.url.includes('kartenliebe.de')) {
+        this.showFeedback('Please navigate to kartenliebe.de first', 'error');
+        return;
+      }
+      
+      const url = new URL(currentTab.url);
+      const urlParams = new URLSearchParams(url.search);
+      
+      // Set or update tileCount parameter
+      urlParams.set('tileCount', '999');
+      
+      // Construct new URL
+      const newUrl = `${url.origin}${url.pathname}?${urlParams.toString()}${url.hash}`;
+      
+      // Navigate to the new URL
+      await chrome.tabs.update(currentTab.id, { url: newUrl });
+      
+      this.showFeedback('Redirecting with tileCount=999...');
+      
+      // Close popup after a short delay
+      setTimeout(() => {
+        window.close();
+      }, 1000);
+      
+    } catch (error) {
+      console.error('Failed to fix tileCount:', error);
+      this.showFeedback('Failed to update URL', 'error');
+    }
   }
 }
 

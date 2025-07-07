@@ -15,6 +15,14 @@ class ProductStatistics {
   async init() {
     console.log('Product Statistics extension loaded');
     
+    // Check if tileCount requirement is met
+    const tileCountCheck = this.checkTileCountRequirement();
+    if (!tileCountCheck.valid) {
+      console.log('Plugin disabled: tileCount parameter must be 999 or higher');
+      this.tileCountError = tileCountCheck.error;
+      return;
+    }
+    
     // Wait for DOM to be ready
     if (document.readyState === 'loading') {
       document.addEventListener('DOMContentLoaded', () => this.startMonitoring());
@@ -53,6 +61,7 @@ class ProductStatistics {
     if (cardsGrid && this.isEnabled) {
       console.log('Found cards-grid, processing product tiles...');
       this.removeInfoTiles();
+      this.removeFilterSortationRow();
       this.processProductTiles(cardsGrid);
       this.initializeSortable(cardsGrid);
     }
@@ -434,8 +443,65 @@ class ProductStatistics {
     }
   }
 
+  /**
+   * Remove filter-sortation-row element from the page
+   */
+  removeFilterSortationRow() {
+    const filterSortationRow = document.querySelector('.filter-sortation-row');
+    if (filterSortationRow) {
+      console.log('Removing filter-sortation-row element');
+      filterSortationRow.remove();
+    }
+  }
+
+  /**
+   * Check if tileCount URL parameter meets the requirement (>= 999)
+   */
+  checkTileCountRequirement() {
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const tileCount = urlParams.get('tileCount');
+      
+      if (!tileCount) {
+        const error = 'tileCount parameter not found in URL. Please add ?tileCount=999 or higher to the URL.';
+        console.log(error);
+        return { valid: false, error };
+      }
+      
+      const tileCountValue = parseInt(tileCount, 10);
+      
+      if (isNaN(tileCountValue)) {
+        const error = `tileCount parameter "${tileCount}" is not a valid number. Please use a numeric value of 999 or higher.`;
+        console.log(error);
+        return { valid: false, error };
+      }
+      
+      if (tileCountValue < 999) {
+        const error = `tileCount value ${tileCountValue} is below required minimum of 999. Please set tileCount to 999 or higher.`;
+        console.log(error);
+        return { valid: false, error };
+      }
+      
+      console.log(`tileCount requirement met: ${tileCountValue} >= 999`);
+      return { valid: true };
+      
+    } catch (error) {
+      const errorMsg = `Error checking tileCount requirement: ${error.message}`;
+      console.error(errorMsg);
+      return { valid: false, error: errorMsg };
+    }
+  }
+
   // Public methods for popup communication
   toggle() {
+    // Check tileCount requirement before allowing toggle
+    const tileCountCheck = this.checkTileCountRequirement();
+    if (!tileCountCheck.valid) {
+      console.log('Cannot enable plugin: tileCount parameter must be 999 or higher');
+      this.tileCountError = tileCountCheck.error;
+      return false;
+    }
+    
     this.isEnabled = !this.isEnabled;
     
     if (this.isEnabled) {
@@ -531,7 +597,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       sendResponse({ success: true });
       break;
     case 'getStatus':
-      sendResponse({ enabled: productStats.isEnabled });
+      sendResponse({
+        enabled: productStats.isEnabled,
+        tileCountError: productStats.tileCountError || null
+      });
       break;
     case 'resetOrder':
       productStats.resetCustomOrder();

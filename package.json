@@ -1,12 +1,12 @@
 {
   "name": "product-statistics-chrome-extension",
-  "version": "1.0.0",
+  "version": "1.2.0",
   "description": "Chrome extension for displaying product statistics on Kartenliebe.de",
   "main": "manifest.json",
   "scripts": {
     "dev": "echo 'Development mode - load unpacked extension in Chrome at chrome://extensions/'",
     "build": "echo 'Build for production - extension is ready to package'",
-    "package": "zip -r product-statistics-v1.0.0.zip . -x node_modules/\\* .git/\\* *.md package*.json",
+    "package": "zip -r product-statistics-v1.2.0.zip . -x node_modules/\\* .git/\\* *.md package*.json",
     "lint": "eslint src/",
     "test": "echo 'No tests specified yet'"
   },
